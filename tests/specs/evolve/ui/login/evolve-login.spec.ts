@@ -7,16 +7,7 @@ test.describe("Evolve Sign-In Flow", () => {
     "Verify sign-in form controls from main page and generic login page",
     meta({
       tags: [TAGS.EVOLVE, TAGS.LOGIN, TAGS.SMOKE],
-      jira: [
-        "EDQAENG-29640",
-        "EDQAENG-29641",
-        "EDQAENG-29642",
-        "EDQAENG-29643",
-        "EDQAENG-29644",
-        "EDQAENG-29645",
-        "EDQAENG-29646",
-        "EDQAENG-29647",
-      ],
+      jira: ["EDQAENG-29640"],
     }),
     async ({ ui, assertions }) => {
       // Arrange
