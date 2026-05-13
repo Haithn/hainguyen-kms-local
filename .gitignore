@@ -1,0 +1,16 @@
+# IDE & tools
+.claude/
+.github/
+.vscode/
+
+# Playwright
+.playwright/
+.playwright-cli/
+node_modules/
+reports/
+playwright-report/
+test-results/
+
+# Environment — exclude all .env files, keep .example templates
+env/.env.*
+!env/.env.*.example
