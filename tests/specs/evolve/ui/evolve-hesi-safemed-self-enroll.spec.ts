@@ -1,8 +1,8 @@
-import { expect, test } from "../../../../fixtures/merged.fixture";
-import { MyEvolvePage } from "../../../../../page-objects/pages/evolve/my-evolve.page";
-import { getCreateStudentTestData } from "../../../../../utils/helpers/create-student-testdata";
-import { meta, TAGS } from "../../../../../utils/helpers/tags";
-import { timeouts } from "../../../../../utils/helpers/timeouts";
+import { expect, test } from "../../fixtures/merged.fixture";
+import { MyEvolvePage } from "../../../page-objects/pages/evolve/my-evolve.page";
+import { getCreateStudentTestData } from "../../../utils/helpers/create-student-testdata";
+import { meta, TAGS } from "../../../utils/helpers/tags";
+import { timeouts } from "../../../utils/helpers/timeouts";
 
 const HESI_SAFEMED_COURSE_ID = "175352_cfacultymanual_hsm0001";
 const INSTRUCTOR_LED_PRODUCT_TYPE = "Instructor-Led Course";

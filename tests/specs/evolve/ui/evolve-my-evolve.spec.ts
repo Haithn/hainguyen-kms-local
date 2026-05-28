@@ -1,19 +1,19 @@
 import Env from "env/env.global";
-import { expect, test as base } from "../../../../fixtures/merged.fixture";
-import { meta, TAGS } from "../../../../../utils/helpers/tags";
-import { timeouts } from "../../../../../utils/helpers/timeouts";
+import { expect, test as base } from "../../fixtures/merged.fixture";
+import { meta, TAGS } from "../../../utils/helpers/tags";
+import { timeouts } from "../../../utils/helpers/timeouts";
 import {
   USER_STORAGE_KEYS,
   DYNAMIC_USER_KEY_PREFIXES,
   REMOVABLE_USER_KEYS,
   REMAINING_SYSTEM_KEYS,
-} from "../../../../../utils/constants/local-storage-keys";
+} from "../../../utils/constants/local-storage-keys";
 import {
   getLocalStorageSnapshot,
   verifyKeysRemoved,
   verifyKeysRemaining,
   detectUnexpectedChanges,
-} from "../../../../../utils/helpers/local-storage";
+} from "../../../utils/helpers/local-storage";
 
 const FACULTY_SYSTEM_ADMIN_USERNAME = "fmanualh460";
 const CAMPUSPACK_ADMIN_PORTAL_URL =
