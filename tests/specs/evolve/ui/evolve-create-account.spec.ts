@@ -41,9 +41,6 @@ test.describe("Evolve Student Registration Flow", () => {
         return normalizedLocationValues[normalizedValue] ?? normalizedValue;
       };
 
-      const normalizePhoneValue = (value: string): string =>
-        value.replace(/\D/g, "").slice(-10);
-
       const logVerify = (
         label: string,
         expected: unknown,

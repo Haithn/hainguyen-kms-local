@@ -29,9 +29,6 @@ test.describe("Evolve Student Home Registration Flow", () => {
       const student = getCreateStudentTestData({ preserveEmailDomain: true });
       const keyword = "health";
 
-      const normalizePhoneValue = (value: string): string =>
-        value.replace(/\D/g, "").slice(-10);
-
       const logVerify = (
         label: string,
         expected: unknown,
