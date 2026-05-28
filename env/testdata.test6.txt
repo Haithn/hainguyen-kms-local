@@ -1,0 +1,32 @@
+###CREATE NEW STUDENT
+
+"email": "testaccevl.mqe[date]_hstu[xxx]@sharklasers.com" //[date]=current date with format mmddyy, [xxx] number increase from 001. Note: @sharklasers.com is domain using when testcase does not required verify phone number, if testcase required phonenumbe - using @spam4.me
+"phone": +202 xxx-xxxx // if required, phone is unique so random create new phone when running create student TCs
+"firstName": "Student",
+"lastName": "Manualh",
+"password": "Test12345",
+"confirmation password": "Test12345"
+"institution Country": "United States",
+"institution State": "Tennessee",
+"institution name":"Lipscomb University (Nashville)"
+"programType": "Athletic Training",
+"graduationYear": 2027,
+"addresses": [
+	{
+		"country": "United States",
+		"state": "Alaska",
+		"address1": "HN",
+		"city": "HN",
+		"postalCode": "67887",
+		"addressType": "BILLING_ADDRESS"
+	}
+    {
+		"country": "United States",
+		"state": "Alaska",
+		"address1": "HN",
+		"city": "HN",
+		"postalCode": "67887",
+        "shipping phone": "(202) 787-8788"
+		"addressType": "SHIPPING_ADDRESS"
+	}
+	]
