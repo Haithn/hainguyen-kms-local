@@ -153,14 +153,14 @@ export class LoginPage {
   async clickLoginWithPassword(): Promise<void> {
     await this.dismissPendoGuideIfPresent();
 
-    // const isPasswordInputVisible = await this.elements
-    //   .passwordInput()
-    //   .isVisible()
-    //   .catch(() => false);
+    const isPasswordInputVisible = await this.elements
+      .passwordInput()
+      .isVisible()
+      .catch(() => false);
 
-    // if (isPasswordInputVisible) {
-    //   return;
-    // }
+    if (isPasswordInputVisible) {
+      return;
+    }
 
     const isStandaloneLogin = await this.elements
       .enterPasswordButton()
@@ -168,35 +168,36 @@ export class LoginPage {
       .catch(() => false);
 
     if (isStandaloneLogin) {
-        await this.elements.enterPasswordButton().click();
-      return;
+      await this.elements.enterPasswordButton().click();
+    } else {
+      const hasSignInWithPassword = await this.elements
+        .signInWithPasswordButton()
+        .isVisible()
+        .catch(() => false);
+
+      if (hasSignInWithPassword) {
+        await this.elements.signInWithPasswordButton().click();
+      }
     }
 
-    // const hasSignInWithPassword = await this.elements
-    //   .signInWithPasswordButton()
-    //   .isVisible()
-    //   .catch(() => false);
-
-    // if (hasSignInWithPassword) {
-    //   await this.elements.signInWithPasswordButton().click();
-    // }
-  }
-
-  /** @param password - Account password */
-  async fillPassword(password: string): Promise<void> {
-    // const isPasswordInputVisible = await this.elements
-    //   .passwordInput()
-    //   .isVisible()
-    //   .catch(() => false);
-
-    // if (!isPasswordInputVisible) {
-      await this.clickLoginWithPassword();
-    // }
-
+    // Wait for password input to appear after switching to password login
     await this.elements.passwordInput().waitFor({
       state: "visible",
       timeout: 10000,
     });
+  }
+
+  /** @param password - Account password */
+  async fillPassword(password: string): Promise<void> {
+    const isPasswordInputVisible = await this.elements
+      .passwordInput()
+      .isVisible()
+      .catch(() => false);
+
+    if (!isPasswordInputVisible) {
+      await this.clickLoginWithPassword();
+    }
+
     await this.elements.passwordInput().fill(password);
   }
 

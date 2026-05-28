@@ -1,6 +1,6 @@
-import { test } from "../../fixtures/merged.fixture";
-import { randomEmail } from "../../../utils/helpers/string";
-import { meta, TAGS } from "../../../utils/helpers/tags";
+import { test } from "tests/fixtures/merged.fixture";
+import { randomEmail } from "utils/helpers/string";
+import { meta, TAGS } from "utils/helpers/tags";
 
 test.describe("Evolve Sign-In Flow", () => {
   test(

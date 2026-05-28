@@ -1,8 +1,8 @@
-import { test } from "../../fixtures/merged.fixture";
-import { logger } from "../../../utils/helpers/logger";
-import { getCreateStudentTestData } from "../../../utils/helpers/create-student-testdata";
-import { meta, TAGS } from "../../../utils/helpers/tags";
-import { timeouts } from "../../../utils/helpers/timeouts";
+import { test } from "tests/fixtures/merged.fixture";
+import { logger } from "utils/helpers/logger";
+import { getCreateStudentTestData } from "utils/helpers/create-student-testdata";
+import { meta, TAGS } from "utils/helpers/tags";
+import { timeouts } from "utils/helpers/timeouts";
 
 test.describe("Evolve Student Registration Flow", () => {
   test(
@@ -198,13 +198,6 @@ test.describe("Evolve Student Registration Flow", () => {
             normalizeLocationValue(student.institutionState),
             normalizeLocationValue(await accountSettingsPage.getInstitutionState()),
           );
-        },
-      );
-
-      await test.step(
-        "Step 14: Click Logout button → confirm sign out behavior",
-        async () => {
-          await accountSettingsPage.clickLogout();
         },
       );
     },

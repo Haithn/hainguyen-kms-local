@@ -1,8 +1,8 @@
-import { test } from "../../fixtures/merged.fixture";
-import { logger } from "../../../utils/helpers/logger";
-import { getCreateStudentTestData } from "../../../utils/helpers/create-student-testdata";
-import { meta, TAGS } from "../../../utils/helpers/tags";
-import { timeouts } from "../../../utils/helpers/timeouts";
+import { test } from "tests/fixtures/merged.fixture";
+import { logger } from "utils/helpers/logger";
+import { getCreateStudentTestData } from "utils/helpers/create-student-testdata";
+import { meta, TAGS } from "utils/helpers/tags";
+import { timeouts } from "utils/helpers/timeouts";
 
 test.describe("Evolve Student Home Registration Flow", () => {
   test(

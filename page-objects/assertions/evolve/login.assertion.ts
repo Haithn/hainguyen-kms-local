@@ -73,6 +73,10 @@ export class LoginAssertion {
    */
   async verifyPasswordLoginState(checkCloseButton = true): Promise<void> {
     await expect(this.loginPage.elements.emailInput()).toBeEnabled();
+    // Wait for password input to be visible before checking if it's enabled
+    await expect(this.loginPage.elements.passwordInput()).toBeVisible({
+      timeout: 10000,
+    });
     await expect(this.loginPage.elements.passwordInput()).toBeEnabled();
     await expect(this.loginPage.elements.signInButton()).toBeDisabled();
     await expect(this.loginPage.elements.getAOneTimeCodeButton()).toBeVisible();
