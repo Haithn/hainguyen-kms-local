@@ -11,6 +11,16 @@ reports/
 playwright-report/
 test-results/
 
+# Temporary files & probes
+.tmp/
+tmp-*.js
+tmp-*.log
+tmp-*.png
+tmp-*.gif
+
+# Selenium migration project — not needed in main repo
+evolve-ps-auto-regression-pw/
+
 # Environment — exclude all .env files, keep .example templates
 env/.env.*
 !env/.env.*.example
