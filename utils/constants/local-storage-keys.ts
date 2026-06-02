@@ -9,6 +9,8 @@ export const USER_STORAGE_KEYS = {
   USER_ID: "elsevier.userId",
   EUID: "elsevier._euid",
   USERNAME: "elsevier.username",
+  ACCESS_END_DATES: "elsevier.accessEndDates",
+  ACCESS_END_DATES_LAST_CALL: "elsevier.accessEndDatesTimeStampForLastCall",
   EVENT_COLLECTOR: "elsevier.eventCollectorEnabled",
   ROLE: "security.elsevier.role",
   CERT: "elsevier.EVAE2_CERTF",

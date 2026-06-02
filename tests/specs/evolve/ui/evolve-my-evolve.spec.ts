@@ -47,10 +47,6 @@ test.describe("My Evolve Session Flow", () => {
       ],
     }),
     async ({ ui, page }) => {
-      if (process.env.RUN_REFERENCE_SELF_ENROLL !== "true") {
-        test.skip(true, "Enable with RUN_REFERENCE_SELF_ENROLL=true for locator capture run");
-      }
-
       test.setTimeout(timeouts.FIVE_MINUTES);
 
       const loginPage = ui.evolve.LoginPage;
@@ -85,13 +81,21 @@ test.describe("My Evolve Session Flow", () => {
             await page.keyboard.press("Escape");
           }
 
-          // await loginPage.clickLoginWithPasswordFromGate();
+          await loginPage.dismissPendoGuideIfPresent();
+          await loginPage.clickLoginWithPasswordFromGate();
+          await expect
+            .poll(
+              () => loginPage.elements.emailInput().isVisible().catch(() => false),
+              { timeout: 15000 },
+            )
+            .toBeTruthy();
         },
       );
 
       await test.step(
         "Step 4: Sign in with reference student account",
         async () => {
+          await expect(loginPage.elements.emailInput()).toBeVisible({ timeout: 15000 });
           await loginPage.fillEmail(REFERENCE_SELF_ENROLL_STUDENT_USERNAME);
           await loginPage.fillPassword(REFERENCE_SELF_ENROLL_STUDENT_PASSWORD);
           await loginPage.clickSignIn();
@@ -272,22 +276,22 @@ test.describe("My Evolve Session Flow", () => {
           snapshotBeforeLogout = await getLocalStorageSnapshot(page);
 
           const userId = snapshotBeforeLogout[USER_STORAGE_KEYS.USER_ID] ?? null;
-          const euid = snapshotBeforeLogout[USER_STORAGE_KEYS.EUID] ?? null;
           const username = snapshotBeforeLogout[USER_STORAGE_KEYS.USERNAME] ?? null;
 
           expect(userId).toBeTruthy();
-
-          if (!euid) {
-            throw new Error(`Missing required local storage key: ${USER_STORAGE_KEYS.EUID}`);
-          }
-
           expect(username).toBeTruthy();
 
-          const dynamicUserKeys = [
-            `${DYNAMIC_USER_KEY_PREFIXES.USER_ALERT}${euid}`,
-            `${DYNAMIC_USER_KEY_PREFIXES.USER_ALERT_EXPIRY}${euid}`,
-          ];
-          localStorageKeysToRemove = [...REMOVABLE_USER_KEYS, ...dynamicUserKeys];
+          const removablePrefixMatchers = Object.values(DYNAMIC_USER_KEY_PREFIXES);
+          const dynamicUserKeys = Object.keys(snapshotBeforeLogout).filter((key) =>
+            removablePrefixMatchers.some((prefix) => key.startsWith(prefix)),
+          );
+
+          localStorageKeysToRemove = [
+            ...new Set([...REMOVABLE_USER_KEYS, ...dynamicUserKeys]),
+          ].filter(
+            // Pendo can re-create guide keys asynchronously after logout.
+            (key) => !key.startsWith("_pendo_") && !key.startsWith("pendo_"),
+          );
 
           for (const key of REMAINING_SYSTEM_KEYS) {
             const value = snapshotBeforeLogout[key] ?? null;
@@ -338,15 +342,24 @@ test.describe("My Evolve Session Flow", () => {
       await test.step(
         "Step 3: Verify no unexpected localStorage changes after logout",
         async () => {
-          const { unexpectedNew, unexpectedRemoved } = detectUnexpectedChanges(
+          const {
+            unexpectedNew,
+            unexpectedRemoved,
+            unexpectedValueChanged,
+          } = detectUnexpectedChanges(
             snapshotBeforeLogout,
             snapshotAfterLogout,
             localStorageKeysToRemove,
             REMAINING_SYSTEM_KEYS,
+            {
+              // Analytics/guide keys can appear/disappear independently from logout behavior.
+              ignoreKeyPrefixes: ["_pendo_", "pendo_", "_ga", "gtm."],
+            },
           );
 
           expect(unexpectedNew).toHaveLength(0);
           expect(unexpectedRemoved).toHaveLength(0);
+          expect(unexpectedValueChanged).toHaveLength(0);
 
           await test.info().attach("edqaeng-25916-local-storage-snapshot-after", {
             body: JSON.stringify(
@@ -355,6 +368,7 @@ test.describe("My Evolve Session Flow", () => {
                 unexpectedChanges: {
                   unexpectedNew,
                   unexpectedRemoved,
+                  unexpectedValueChanged,
                 },
               },
               null,

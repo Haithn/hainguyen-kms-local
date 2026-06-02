@@ -1,5 +1,27 @@
 import { type Page } from "@playwright/test";
 
+export type LocalStorageDiffOptions = {
+  ignoreExactKeys?: string[];
+  ignoreKeyPrefixes?: string[];
+  compareValuesForKeys?: string[];
+};
+
+const shouldIgnoreKey = (
+  key: string,
+  options?: LocalStorageDiffOptions,
+): boolean => {
+  if (!options) {
+    return false;
+  }
+
+  const exactIgnored = options.ignoreExactKeys?.includes(key) ?? false;
+  if (exactIgnored) {
+    return true;
+  }
+
+  return options.ignoreKeyPrefixes?.some((prefix) => key.startsWith(prefix)) ?? false;
+};
+
 /**
  * Captures a snapshot of the entire browser localStorage.
  * More efficient than calling getItem() for each key individually.
@@ -79,7 +101,12 @@ export const detectUnexpectedChanges = (
   afterSnapshot: Record<string, string>,
   expectedRemovals: string[],
   expectedRemaining: string[],
-): { unexpectedNew: string[]; unexpectedRemoved: string[] } => {
+  options?: LocalStorageDiffOptions,
+): {
+  unexpectedNew: string[];
+  unexpectedRemoved: string[];
+  unexpectedValueChanged: string[];
+} => {
   const beforeKeys = new Set(Object.keys(beforeSnapshot));
   const afterKeys = new Set(Object.keys(afterSnapshot));
   const expectedRemovalSet = new Set(expectedRemovals);
@@ -89,15 +116,37 @@ export const detectUnexpectedChanges = (
     (k) =>
       !beforeKeys.has(k) &&
       !expectedRemainingSet.has(k) &&
-      !expectedRemovalSet.has(k),
+      !expectedRemovalSet.has(k) &&
+      !shouldIgnoreKey(k, options),
   );
 
   const unexpectedRemoved = [...beforeKeys].filter(
     (k) =>
       !afterKeys.has(k) &&
       !expectedRemovalSet.has(k) &&
-      expectedRemainingSet.has(k),
+      !shouldIgnoreKey(k, options),
   );
 
-  return { unexpectedNew, unexpectedRemoved };
+  const valueComparisonSet = new Set(options?.compareValuesForKeys ?? []);
+
+  const unexpectedValueChanged = [...valueComparisonSet].filter((k) => {
+    if (!expectedRemainingSet.has(k)) {
+      return false;
+    }
+
+    if (shouldIgnoreKey(k, options)) {
+      return false;
+    }
+
+    const beforeValue = beforeSnapshot[k];
+    const afterValue = afterSnapshot[k];
+
+    if (beforeValue === undefined || afterValue === undefined) {
+      return false;
+    }
+
+    return beforeValue !== afterValue;
+  });
+
+  return { unexpectedNew, unexpectedRemoved, unexpectedValueChanged };
 };

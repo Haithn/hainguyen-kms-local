@@ -70,6 +70,12 @@ export class LoginPage {
       this.page.locator('#createAccountNav, a[href="/cs/register"]').first(),
     studentButton: () =>
       this.page.getByRole("button", { name: "I'm a Student" }),
+    enrollMultipleCoursesEntry: () =>
+      this.page
+        .locator(
+          "a:has-text('Enroll in multiple courses'), button:has-text('Enroll in multiple courses'), a:has-text('Enroll in Multiple Courses'), button:has-text('Enroll in Multiple Courses')",
+        )
+        .first(),
     acceptCookiesButton: () =>
       this.page.getByRole("button", { name: /Accept all cookies/i }),
 
@@ -82,6 +88,23 @@ export class LoginPage {
       this.page.getByText(/You must log in to view this content/i),
     pendoTextContainer: () =>
       this.page.locator("._pendo-text, .pendo-text, [class*='pendo-text'], #pendo-guide-container, #pendo-base").first(),
+    passwordExpiredHeader: () => this.page.locator("#forceChangePasswordHeader").first(),
+    passwordExpiredTitle: () =>
+      this.page.getByText(/Your Password has Expired/i).first(),
+    passwordExpiredDialog: () =>
+      this.page
+        .locator("[role='dialog']:has(#forceChangePasswordHeader), [role='dialog']:has-text('Your Password has Expired')")
+        .first(),
+    bulkEnrollmentOverlay: () =>
+      this.page
+        .locator(
+          "[role='dialog']:has-text('Enroll in Multiple Courses'), .modal-dialog:has-text('Enroll in Multiple Courses'), .modal-content:has-text('Enroll in Multiple Courses')",
+        )
+        .first(),
+    passwordExpiredCloseButton: () =>
+      this.page
+        .locator('button[aria-label*="close" i], button:has-text("X"), button:has-text("Close"), button[class*="close"]')
+        .first(),
   };
 
   constructor(protected page: Page) {}
@@ -257,6 +280,18 @@ export class LoginPage {
     await this.page.waitForURL(/\/cs\/store\?role=student/);
   }
 
+  async clickEnrollInMultipleCourses(): Promise<void> {
+    await this.elements.enrollMultipleCoursesEntry().waitFor({
+      state: "visible",
+      timeout: 15000,
+    });
+    await this.elements.enrollMultipleCoursesEntry().click({ force: true });
+  }
+
+  async isBulkEnrollmentOverlayVisible(): Promise<boolean> {
+    return this.elements.bulkEnrollmentOverlay().isVisible().catch(() => false);
+  }
+
   /** @param courseId - Valid Evolve course ID */
   async redeemCourseId(courseId: string): Promise<void> {
     const isRedeemInputVisible = await this.elements
@@ -321,6 +356,62 @@ export class LoginPage {
     }
 
     await this.clickCreateAccount();
+  }
+
+  async isPasswordExpiredOverlayVisible(): Promise<boolean> {
+    const hasExpiredHeader = await this.elements
+      .passwordExpiredHeader()
+      .isVisible()
+      .catch(() => false);
+    if (hasExpiredHeader) {
+      return true;
+    }
+
+    return this.elements
+      .passwordExpiredTitle()
+      .isVisible()
+      .catch(() => false);
+  }
+
+  async waitForPasswordExpiredOverlay(timeoutMs = 30000): Promise<void> {
+    try {
+      await Promise.any([
+        this.elements.passwordExpiredHeader().waitFor({ state: "visible", timeout: timeoutMs }),
+        this.elements.passwordExpiredTitle().waitFor({ state: "visible", timeout: timeoutMs }),
+      ]);
+    } catch {
+      throw new Error("Password expired overlay was not displayed within timeout.");
+    }
+  }
+
+  async closePasswordExpiredOverlayIfPresent(): Promise<boolean> {
+    const isOverlayVisible = await this.isPasswordExpiredOverlayVisible();
+    if (!isOverlayVisible) {
+      return false;
+    }
+
+    const closeButtonInDialog = this.elements
+      .passwordExpiredDialog()
+      .locator('button[aria-label*="close" i], button:has-text("X"), button:has-text("Close"), button[class*="close"]')
+      .first();
+
+    const hasDialogClose = await closeButtonInDialog.isVisible().catch(() => false);
+    if (hasDialogClose) {
+      await closeButtonInDialog.click();
+      return true;
+    }
+
+    const hasPageClose = await this.elements
+      .passwordExpiredCloseButton()
+      .isVisible()
+      .catch(() => false);
+    if (hasPageClose) {
+      await this.elements.passwordExpiredCloseButton().click();
+      return true;
+    }
+
+    await this.page.keyboard.press("Escape").catch(() => undefined);
+    return true;
   }
 
   // ── Compound methods ────────────────────────────────────────────────────────

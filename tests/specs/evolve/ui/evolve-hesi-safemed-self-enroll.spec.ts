@@ -4,7 +4,7 @@ import { getCreateStudentTestData } from "utils/helpers/create-student-testdata"
 import { meta, TAGS } from "utils/helpers/tags";
 import { timeouts } from "utils/helpers/timeouts";
 
-const HESI_SAFEMED_COURSE_ID = "175352_cfacultymanual_hsm0001";
+const HESI_SAFEMED_COURSE_ID = "189889_fmanualh512_hsm0001";
 const INSTRUCTOR_LED_PRODUCT_TYPE = "Instructor-Led Course";
 
 function normalizeCourseTitleForMatch(value: string): string {

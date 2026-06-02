@@ -1,4 +1,4 @@
-import { type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 
 export class AccountSettingsPage {
   constructor(protected page: Page) {}
@@ -61,15 +61,11 @@ export class AccountSettingsPage {
   }
 
   async getInstitutionCountry(): Promise<string> {
-    return this.normalizeSelectValue(
-      await this.elements.institutionCountryDropdown().inputValue(),
-    );
+    return this.getSelectDisplayValue(this.elements.institutionCountryDropdown());
   }
 
   async getInstitutionState(): Promise<string> {
-    return this.normalizeSelectValue(
-      await this.elements.institutionStateDropdown().inputValue(),
-    );
+    return this.getSelectDisplayValue(this.elements.institutionStateDropdown());
   }
 
   async getInstitutionName(): Promise<string> {
@@ -77,15 +73,32 @@ export class AccountSettingsPage {
   }
 
   async getProgramType(): Promise<string> {
-    return this.normalizeSelectValue(
-      await this.elements.programTypeDropdown().inputValue(),
-    );
+    return this.getSelectDisplayValue(this.elements.programTypeDropdown());
   }
 
   async getGraduationYear(): Promise<string> {
-    return this.normalizeSelectValue(
-      await this.elements.graduationYearDropdown().inputValue(),
-    );
+    return this.getSelectDisplayValue(this.elements.graduationYearDropdown());
+  }
+
+  private async getSelectDisplayValue(selectLocator: Locator): Promise<string> {
+    const isVisible = await selectLocator.isVisible().catch(() => false);
+    if (!isVisible) {
+      return "";
+    }
+
+    const selectedOptionText = await selectLocator
+      .locator("option:checked")
+      .first()
+      .textContent()
+      .then((text) => text?.trim() ?? "")
+      .catch(() => "");
+
+    if (selectedOptionText) {
+      return selectedOptionText;
+    }
+
+    const rawValue = await selectLocator.inputValue().catch(() => "");
+    return this.normalizeSelectValue(rawValue.trim());
   }
 
   private normalizeSelectValue(value: string): string {
